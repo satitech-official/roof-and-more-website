@@ -1,7 +1,11 @@
 import { blogPosts, projects, routeList } from "./data";
 
+export const dynamic = "force-static";
+
 export default function sitemap() {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://roof-and-more.example";
+  const baseUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    "https://satitech-official.github.io/roof-and-more-website";
   const now = new Date();
   const routes = [
     "",
