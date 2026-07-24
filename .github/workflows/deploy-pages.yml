@@ -3,6 +3,8 @@ name: Deploy Roof and More to GitHub Pages
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - deployment-status.json
   workflow_dispatch:
 
 permissions:
@@ -10,9 +12,9 @@ permissions:
   pages: write
   id-token: write
 
-environment:
-  name: github-pages
-  url: ${{ steps.deployment.outputs.page_url }}
+concurrency:
+  group: pages
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -50,6 +52,9 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
@@ -80,7 +85,12 @@ jobs:
             const path = 'deployment-status.json';
             let sha;
             try {
-              const existing = await github.rest.repos.getContent({ owner: context.repo.owner, repo: context.repo.repo, path, ref: 'main' });
+              const existing = await github.rest.repos.getContent({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                path,
+                ref: 'main'
+              });
               sha = existing.data.sha;
             } catch (error) {
               if (error.status !== 404) throw error;
